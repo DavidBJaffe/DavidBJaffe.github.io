@@ -181,7 +181,11 @@
        one. Multi-column flows each column independently, so there are no holes — and
        once the tiles no longer have to share a row height, the forced 4:3 can go too,
        and every photo shows at its own aspect instead of being cropped to it. */
-    .pics, .pics.packed { display: block; columns: 2; column-gap: 3.5vw; height: auto; }
+    /* the trailing margin on the last tile does NOT extend the multi-column box, so
+       without this the Pubs card butts straight against the photos. 3.5vw = the same
+       gap `.card` leaves below the bio, so the three blocks keep one rhythm. */
+    .pics, .pics.packed { display: block; columns: 2; column-gap: 3.5vw; height: auto;
+      margin-bottom: 3.5vw; }
     .pics .cell, .pics.packed .cell { position: relative; left: auto !important;
       top: auto !important; width: 100% !important; height: auto !important;
       aspect-ratio: auto; margin: 0 0 3.5vw;
