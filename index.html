@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>David B Jaffe</title>
+<meta name="description" content="Antibodies">
+<meta property="og:type" content="website">
+<meta property="og:title" content="David B Jaffe">
+<meta property="og:description" content="Antibodies">
+<meta property="og:url" content="https://bit.ly/dbj99">
+<meta property="og:image" content="https://davidbjaffe.github.io/pics/me.jpg">
+<meta property="og:image:alt" content="David B Jaffe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="David B Jaffe">
+<meta name="twitter:description" content="Antibodies">
+<meta name="twitter:image" content="https://davidbjaffe.github.io/pics/me.jpg">
+<style>
+  :root {
+    --accent: hsl(25 55% 42%);
+    --accent-soft: hsl(25 45% 95%);
+    --ink: #20242b;
+    --paper: #fbfaf7;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    /* Pairing: humanist sans for UI/headings/the dense pub list; the bio prose
+       keeps a calm serif (see .bio p / .bio .int) for warmth. */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink); background: var(--paper);
+    height: 100vh; overflow: hidden;
+  }
+  .page {
+    display: grid; height: 100vh; width: 100%; gap: 1.1vmin; padding: 1.4vmin;
+    grid-template-columns: minmax(0, 25.3fr) minmax(0, 74.7fr); overflow: hidden;
+  }
+  .col { min-height: 0; min-width: 0; display: flex; flex-direction: column; gap: 1.1vmin; overflow: hidden; }
+  .side { order: 2; }
+  .pubs { order: 1; }
+
+  .card { background: #fff; border: 1px solid #e7e3da; border-radius: 10px; padding: 1.2vmin 1.5vmin; min-height: 0; }
+
+  /* bio */
+  /* PURE WHITE, deliberately: the two panels are identical at the top (same heading,
+     same first-line height), so brightness is the only thing telling the eye where to
+     start. White puts the bio a clear step ABOVE the paper (255 vs 250) and two above
+     the muted pubs panel (242). A tinted bio was tried and dropped — at a lightness
+     subtle enough to look good (hsl(hue 52% 97.5%) = 248.6) it lands BELOW the paper,
+     so the card stops advancing and only its border separates it from the page. */
+  .bio { background: #fff; }
+  .bio h1 { font-family: Verdana, Geneva, "Segoe UI", sans-serif; font-size: clamp(15px, 2.6vmin, 30px); margin: 0 0 .4em; color: var(--accent); letter-spacing: .2px; }
+  /* Verdana for the bio prose: very legible workhorse humanist sans; Geneva / Segoe UI
+     are the cross-platform fallbacks. */
+  .bio p { font-family: Verdana, Geneva, "Segoe UI", sans-serif; font-weight: 400; margin: .25em 0; font-size: clamp(10px, 1.55vmin, 16px); line-height: 1.34; }
+  .bio .int { font-family: Verdana, Geneva, "Segoe UI", sans-serif; font-weight: 400; margin: .3em 0 0; padding-left: 1.1em; font-size: clamp(9px, 1.45vmin, 15px); line-height: 1.32; }
+  .bio .int li { margin: .12em 0; }
+  /* email: monospace signals a literal/copyable string and disambiguates chars;
+     accent color + hover underline mark it as the one clickable thing in the bio. */
+  .bio a.email { font-family: ui-monospace, Menlo, "SF Mono", Consolas, monospace;
+    font-size: .92em; color: var(--accent); text-decoration: none; word-break: break-all; }
+  .bio a.email:hover { text-decoration: underline; }
+
+  /* photo */
+  .photo { display: flex; gap: 1.2vmin; align-items: flex-start; }
+  .photo .frame { flex: 0 0 auto; width: clamp(90px, 16vmin, 220px); aspect-ratio: 1 / 1;
+    border-radius: 12px; overflow: hidden; border: 3px solid var(--accent);
+    transform: rotate(-1.44deg); box-shadow: 0 3px 14px rgba(0,0,0,.16); }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo .who { font-size: clamp(9px, 1.4vmin, 15px); align-self: flex-end; }
+  .photo .who .credit { color: #8a8378; font-style: italic; font-size: .82em; }
+
+  /* publications */
+  /* The pubs panel sits one step BELOW the paper in brightness while the bio sits
+     just above it (--tint), so the eye lands on the bio first. Muting the secondary
+     panel is what creates the hierarchy — a tint on the bio ALONE reads as darker
+     than a white pubs card and pulls the eye the wrong way. */
+  .pubs .card { flex: 1; min-height: 0; display: flex; flex-direction: column;
+    background: #f5f2ec; border-color: #e3ded3; }
+  /* The heading is dressed EXACTLY like `.bio h1` (same family, size, letter-spacing
+     and .4em bottom margin) so the two columns' tops line up to the pixel. One
+     wrinkle: `.bio` is ordinary block flow, where h1's .4em bottom margin COLLAPSES
+     with the first paragraph's .25em top margin (max wins => .4em). `.pubs .card` is
+     a flex column, where margins never collapse — so the list must keep margin-top 0
+     for the gap here to come out at the same .4em. */
+  .pubs h2 { font-family: Verdana, Geneva, "Segoe UI", sans-serif;
+    margin: 0 0 .4em; font-size: clamp(15px, 2.6vmin, 30px); color: var(--accent); letter-spacing: .2px;
+    display: flex; align-items: baseline; gap: .5em; }
+  .pubs h2 small { font-size: .55em; color: #9a9387; font-weight: normal; }
+  /* Always-visible slim scrollbar: on macOS the default overlay scrollbar hides
+     until you interact, so a visitor gets no cue the panel holds more below the
+     fold. `overflow-y: scroll` (not `auto`) + a styled `::-webkit-scrollbar`
+     keep it shown in Chrome/Safari; `scrollbar-gutter: stable` reserves its lane
+     so nothing shifts. The 2px white border insets the thumb to a slim ~5px pill.
+     ⚠️ Deliberately NO standard `scrollbar-width`/`scrollbar-color`: when either is
+     set, Chrome/Safari (2024+) IGNORE `::-webkit-scrollbar` per spec and revert to a
+     hiding overlay — which is exactly what we're trying to avoid. So we style ONLY
+     the WebKit pseudo. (Firefox, which lacks `::-webkit-scrollbar`, therefore keeps
+     its default overlay bar — it has no CSS way to force always-on anyway.) */
+  .pubs .lead { flex: 0 0 auto; }
+  /* Body type matches `.bio p` (family, size, line-height) so the first entry's first
+     line sits at the same height as the bio's first line; the .25em top margin is the
+     one `.bio p` carries (it does NOT collapse on either side — see .pubs h2). */
+  .publist { flex: 1; min-height: 0; overflow-y: scroll; overflow-x: hidden; scrollbar-gutter: stable;
+    list-style: none; margin: .25em 0 0; padding: 0 .6vmin 0 0;
+    font-family: Verdana, Geneva, "Segoe UI", sans-serif; font-size: clamp(10px, 1.55vmin, 16px); }
+  .publist::-webkit-scrollbar { width: 9px; }
+  .publist::-webkit-scrollbar-track { background: transparent; }
+  .publist::-webkit-scrollbar-thumb { background: #a9a08f; border-radius: 9px; border: 2px solid #fff; }
+  .publist::-webkit-scrollbar-thumb:hover { background: #8a8378; }
+  .publist li { break-inside: avoid; margin: 0 0 .42em; padding-bottom: .42em; line-height: 1.34; padding-left: 2.6em; text-indent: -2.6em;
+    border-bottom: 1px solid hsl(142 40% 68%); }
+  .publist li:last-child { border-bottom: none; padding-bottom: 0; }
+  .publist .yr { color: var(--accent); font-weight: 700; font-feature-settings: "tnum"; margin-right: .35em; }
+  .publist .ti { }
+  .publist .mt { color: #6c665b; }
+  .publist .mt i { color: #423d35; }
+  .publist .lnk { color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+  .publist .lnk:hover { text-decoration: underline; }
+  /* optional author's note: full-width under the entry (cancel the hanging indent),
+     smaller and muted, with a thin green rule tying it to the separators. */
+  .publist .cmt { text-indent: 0; margin: .35em 0 .1em -2.6em; padding: .1em .7em;
+    border-left: 2px solid hsl(142 40% 68%); border-right: 2px solid hsl(142 40% 68%);
+    color: #6c665b; font-size: .9em; line-height: 1.32; }
+
+  /* pics mosaic — a client-side squarified treemap (layoutPics in the script).
+     The block is a positioning context; each .cell is absolutely placed to fill
+     it exactly. Until JS runs (or with JS off) the no-JS grid fallback shows. */
+  .pics { flex: 1; min-height: 0; position: relative; overflow: hidden; background: var(--paper);
+    display: grid; gap: .9vmin; grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: minmax(0, 1fr); grid-auto-flow: dense; }
+  .pics.packed { display: block; }                 /* JS took over: absolute cells */
+  .cell { position: relative; margin: 0; min-width: 0; min-height: 0; overflow: hidden;
+    border-radius: 7px; background: #ece8df; }
+  .pics.packed .cell { position: absolute; }
+  .cell > img, .cell > video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cell.me { background: #fff; }
+  .cell.me > img { object-fit: contain; }          /* my photo: never trimmed */
+  /* hover caption: the pics/<stem>.txt sidecar (multi-line) or the filename */
+  .cell figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: .45em .6em;
+    font-size: clamp(8px, 1.2vmin, 13px); line-height: 1.28; color: #fff;
+    background: linear-gradient(transparent, rgba(0,0,0,.72)); opacity: 0; transition: opacity .18s; }
+  .cell figcaption i { color: #e9e4da; }
+  /* the caption is not shown on the tile — it appears only in the enlarged view below */
+  .cell { cursor: zoom-in; }
+  .cell:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  /* zoom-in hint icon, per tile. On MOUSE hover the OS zoom-in cursor already
+     signals this, so the corner icon only shows on keyboard focus (no cursor there). */
+  .cell .mag { position: absolute; top: .4em; right: .4em; width: clamp(16px, 2.3vmin, 26px);
+    height: auto; color: #fff; opacity: 0; transition: opacity .18s; pointer-events: none; z-index: 2;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,.7)); }
+  .cell:focus-visible .mag { opacity: .95; }
+  /* lightbox: a viewport-fixed OPAQUE WHITE overlay (nothing underneath shows through);
+     the .txt caption sits beneath the photo in black. */
+  #lb { position: fixed; inset: 0; z-index: 100; display: none; place-items: center;
+    background: #fff; padding: 3.5vmin; cursor: zoom-out; }
+  #lb.open { display: grid; }
+  #lb figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1.6vmin;
+    max-width: 94vw; max-height: 94vh; }
+  #lb img, #lb video { max-width: 90vw; max-height: 82vh; width: auto; height: auto; object-fit: contain;
+    border-radius: 8px; box-shadow: 0 6px 30px rgba(0,0,0,.22); }
+  #lb figcaption { color: #000; font-family: Verdana, Geneva, "Segoe UI", sans-serif;
+    font-size: clamp(12px, 1.7vmin, 18px); line-height: 1.4; text-align: center; max-width: 82vw; }
+  #lb figcaption i { color: #333; }
+
+  /* phone: stop fighting the viewport — stack and allow scrolling */
+  @media (max-width: 640px) {
+    html, body { height: auto; overflow-x: hidden; overflow-y: auto; }
+    .page { display: block; height: auto; width: 100%; max-width: 100%; padding: 3.5vw; }
+    .col { display: block; max-width: 100%; }
+    .card { max-width: 100%; }
+    .side, .pubs { order: initial; }
+    .card { margin-bottom: 3.5vw; }
+    .photo { flex-wrap: wrap; }
+    .photo .frame { width: 40vw; }
+    .publist { columns: 1; font-size: 14px !important; overflow: visible; }
+    img, video { max-width: 100%; }
+    /* phone: ignore the packed treemap; a simple 2-col grid that scrolls */
+    .pics, .pics.packed { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: auto; height: auto; }
+    .pics.packed .cell { position: relative; left: auto !important; top: auto !important;
+      width: auto !important; height: auto !important; aspect-ratio: 4 / 3; }
+    .cell { aspect-ratio: 4 / 3; }
+    .cell.me { aspect-ratio: 3 / 4; }
+    .bio h1, .bio p, .bio .int { font-size: 4vw; }
+    .bio h1, .bio p, .bio li { overflow-wrap: anywhere; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <section class="col side">
+    <div class="card bio"><h1>David B Jaffe</h1><br><p>I was once a bicycle messenger in downtown SF.  In subsequent lives I did algebraic geometry, then coding theory, then genome assembly.  There are ninety-eight other David B Jaffes, who do different things.  I once got a phone call offering me a job on the US Supreme Court; must've been for one of them.</p><br><p>More recently, I've worked on antibodies, including analysis of single cell VDJ data (10x Genomics) and development of therapeutics from antibodies found in humans (Infinimmune).  My latest project is predicting immunogenicity of antibody drugs, and that led to problems involving PDFs: how to ready scientific papers for LLMs.  I'm down that rabbit hole.</p><br><p>I'm a fan of reproducible science, open source, Rust.  I use the hated AI to help code. Hopefully no one is offended, ha ha.  Nonreproducible nonscience: I run trails with a camera and try not to fall.</p><br><p>I'm at <a class="email" href="mailto:99.david.b.jaffe@gmail.com">99.david.b.jaffe@gmail.com</a>. I work independently and am also down for collaborations.</p></div>
+    <div class="pics"><figure class="cell" data-role="pic" data-ar="0.98887" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/elegant_clarkia.jpeg" alt="Elegant clarkia seen while running; I sat down to stare at it, Las Trampas, June 19, 2026, Nikon D7500; 90mm ƒ2.8" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Elegant clarkia seen while running; I sat down to stare at it<br>Las Trampas<br>June 19, 2026<br>Nikon D7500; 90mm ƒ2.8</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.33252" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><video src="pics/bobcat.mp4" poster="pics/bobcat.poster.jpg" loop muted playsinline preload="none" aria-label="Twitchy-tailed bobcat, Tennessee Valley Trail, August 30, 2025, Fujifilm X-H2S; 70-300mm ƒ4-5.6"></video><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Twitchy-tailed bobcat<br>Tennessee Valley Trail<br>August 30, 2025<br>Fujifilm X-H2S; 70-300mm ƒ4-5.6</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.14871" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/muscaria.jpeg" alt="The forest was covered with Amanita muscaria, Lily Lake trail near Crested Butte, Colorado, July 31, 2021, Nikon D7500; 90.0 mm ƒ2.8" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>The forest was covered with <i>Amanita muscaria</i><br>Lily Lake trail near Crested Butte, Colorado<br>July 31, 2021<br>Nikon D7500; 90.0 mm ƒ2.8</figcaption></figure><figure class="cell" data-role="pic" data-ar="0.99872" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/beetles.jpeg" alt="Blister Beetles discussing something, Crested Butte, Colorado, August 5, 2021, Nikon D7500; 90mm ƒ2.8" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Blister Beetles discussing something<br>Crested Butte, Colorado<br>August 5, 2021<br>Nikon D7500; 90mm ƒ2.8</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.19786" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/artichoke.jpeg" alt="Artichoke gone wild, Rocky Ridge Road, on EBMUD land abutting Las Trampas, June 19, 2021, Panasonic DC-FZ1000M2" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Artichoke gone wild<br>Rocky Ridge Road, on EBMUD land abutting Las Trampas<br>June 19, 2021<br>Panasonic DC-FZ1000M2</figcaption></figure><figure class="cell" data-role="elephant" data-ar="1.51643" data-weight="4.00000" tabindex="0" aria-label="Enlarge photo"><video src="pics/elephant_seal.mp4" poster="pics/elephant_seal.poster.jpg" loop muted playsinline preload="none" aria-label="Northern Elephant Seal, thankfully not taking offense, Año Nuevo State Park, January 8, 2022, Sony DSC-RX10M4"></video><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Northern Elephant Seal, thankfully not taking offense<br>Año Nuevo State Park<br>January 8, 2022<br>Sony DSC-RX10M4</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.50000" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/trees_in_fog.jpeg" alt="It was a foggy day, Morgan Territory, January 2, 2021, Panasonic DC-FZ1000M2" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>It was a foggy day<br>Morgan Territory<br>January 2, 2021<br>Panasonic DC-FZ1000M2</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.35200" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/sonorina.jpeg" alt="Cuddly male Xylocopa sonorina in our garden, June 5, 2022, Nikon D7500; 90mm ƒ2.8" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Cuddly male <i>Xylocopa sonorina</i> in our garden<br>June 5, 2022<br>Nikon D7500; 90mm ƒ2.8</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.35735" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/swallowtail.jpg" alt="Western tiger swallowtail on Salvia leucophylla x clevelandii in our garden, June 8, 2024, Fujifilm X-H2S; 70-300mm ƒ4-5.6" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Western tiger swallowtail on <i>Salvia leucophylla</i> x <i>clevelandii</i> in our garden<br>June 8, 2024<br>Fujifilm X-H2S; 70-300mm ƒ4-5.6</figcaption></figure><figure class="cell me" data-role="me" data-ar="0.75000" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/me.jpg" alt="David B Jaffe" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>courtesy Andy Gottscho</figcaption></figure><figure class="cell" data-role="pic" data-ar="1.21597" data-weight="1.00000" tabindex="0" aria-label="Enlarge photo"><img src="pics/bobcat_ridge.jpeg" alt="Bobcat which let me get close because it was busy, Pleasanton Ridge, January 30, 2025, Fujifilm X-H2S; 70-300mm ƒ4-5.6" loading="lazy" decoding="async"><svg class="mag" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="14.8" y1="14.8" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7.2" x2="10" y2="12.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><line x1="7.2" y1="10" x2="12.8" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><figcaption>Bobcat which let me get close because it was busy<br>Pleasanton Ridge<br>January 30, 2025<br>Fujifilm X-H2S; 70-300mm ƒ4-5.6</figcaption></figure></div>
+  </section>
+  <section class="col pubs">
+    <div class="card">
+      <h2>Pubs</h2>
+      <!-- Mirrors the bare <br> the narrative puts between the <h1> and its first
+           paragraph: a block holding one empty line box in the CARD's inherited font,
+           so the first entry starts at exactly the bio's first line. (A bare <br>
+           here would be blockified into a flex item and collapse to zero height.) -->
+      <div class="lead"><br></div>
+      <ol class="publist"><li><span class="yr">2025</span><span class="ti">Preclinical development of a half life extended anti-IL-22 drug for the treatment of atopic dermatitis [abstract]</span><span class="mt"> · Gibbons et al. · <i>Journal of Investigative Dermatology</i></span> <a class="lnk" href="https://www.jidonline.org/article/S0022-202X(25)03424-4/fulltext" target="_blank" rel="noopener">URL</a><div class="cmt">This is the anti-IL22 antibody therapeutic, based on a human sample, that we found at Infinimmune while I was working there.</div></li><li><span class="yr">2025</span><span class="ti">A first-in-class anti-IL17F antibody discovered in humans and engineered in silico for the treatment of inflammatory bowel disease [abstract]</span><span class="mt"> · Gibbons et al. · <i>Gastroenterology</i></span> <a class="lnk" href="https://eposters.ddw.org/ddw/2025/ddw-2025/4156040/wyatt.mcdonnell.a.first-in-class.anti-il17f.antibody.discovered.in.humans.and.html" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2025</span><span class="ti">Preclinical development of an anti-IL-13 antibody for the treatment of atopic dermatitis [abstract]</span><span class="mt"> · Gibbons et al. · <i>Journal of Investigative Dermatology</i></span> <a class="lnk" href="https://www.jidonline.org/article/S0022-202X(25)03447-5/fulltext" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2025</span><span class="ti">Better antibodies engineered with a GLIMPSE of human data</span><span class="mt"> · Hepler et al. · <i>bioRxiv</i></span> <a class="lnk" href="https://www.biorxiv.org/content/10.1101/2025.06.08.658113v2" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2024</span><span class="ti">Deep repertoire mining uncovers ultra-broad coronavirus neutralizing antibodies targeting multiple spike epitopes</span><span class="mt"> · Hurtado et al. · <i>Cell Reports</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/38848216" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2022</span><span class="ti">enclone: precision clonotyping and analysis of immune receptors</span><span class="mt"> · Jaffe et al. · <i>bioRxiv</i></span> <a class="lnk" href="https://www.biorxiv.org/content/10.1101/2022.04.21.489084v2" target="_blank" rel="noopener">URL</a><div class="cmt">This is a tool I built at 10x Genomics to understand antibodies.  It was my first introduction to immunology, and the clonotyping algorithm is (I think) still used by the 10x Genomics pipeline to process VDJ data.</div></li><li><span class="yr">2022</span><span class="ti">Functional antibodies exhibit light chain coherence</span><span class="mt"> · Jaffe et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/36289331" target="_blank" rel="noopener">PubMed</a><div class="cmt">For most functional antibodies, the heavy chain determines the light chain.</div></li><li><span class="yr">2019</span><span class="ti">Genomic architecture and introgression shape a butterfly radiation</span><span class="mt"> · Edelman et al. · <i>Science</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/31672890" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2018</span><span class="ti">Dissecting the causal mechanism of X-linked dystonia-parkinsonism by integrating genome and transcriptome assembly</span><span class="mt"> · Aneichyk et al. · <i>Cell</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/29474918" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2018</span><span class="ti">How to determine the genome sequence of single insects [citation only]</span><span class="mt"> · Keivanfar et al.</span><div class="cmt">I collected individual insects, some very small, then we sequenced and assembled them.  We needed only one 1 ng of DNA!  The assemblies did not have the chromosome-level contiguity that people expected, but because the starting material was a single wild insect, in some ways the assemblies would better reflect biology than would those obtained from a sample comprised of many individuals.</div></li><li><span class="yr">2018</span><span class="ti">Reference quality assembly of the 3.5-Gb genome of <i>Capsicum annuum</i> from a single linked-read library</span><span class="mt"> · Hulse-Kemp et al. · <i>Horticulture Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/29423234" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2017</span><span class="ti">Direct determination of diploid genome sequences</span><span class="mt"> · Weisenfeld et al. · <i>Genome Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/28381613" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2017</span><span class="ti">Improved de novo genome assembly: linked-read sequencing combined with optical mapping produce a high quality mammalian genome at relatively low cost</span><span class="mt"> · Mohr et al. · <i>bioRxiv</i></span> <a class="lnk" href="https://www.biorxiv.org/content/10.1101/128348v2" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2016</span><span class="ti">Evaluation of DISCOVAR de novo using a mosquito sample for cost-effective short-read genome assembly</span><span class="mt"> · Love et al. · <i>BMC genomics</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/26944054" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2014</span><span class="ti">Comprehensive variation discovery in single human genomes</span><span class="mt"> · Weisenfeld et al. · <i>Nature genetics</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/25326702" target="_blank" rel="noopener">PubMed</a><div class="cmt">This paper introduced DISCOVAR, a method for assembling genomes from paired 250 base reads, made from a PCR-free library, starting from 1 µg of DNA, and used subsequently to assemble the genomes of over 100 mammals, see &quot;A comparative genomics multitool for scientific discovery and conservation&quot;, 2020, Nature.  One thing that is not widely understood about genome assembly is that everything depends on DNA starting material, and in many cases one cannot get a large quantity of high molecular weight DNA.  The approach here was optimal for the sweet spot where one could get DNA, but not necessarily of high molecular weight.</div></li><li><span class="yr">2014</span><span class="ti">The genomic substrate for adaptive radiation in African cichlid fish</span><span class="mt"> · Brawand et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/25186727" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2013</span><span class="ti">Assemblathon 2: evaluating de novo methods of genome assembly in three vertebrate species</span><span class="mt"> · Bradnam et al. · <i>GigaScience</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/23870653" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2013</span><span class="ti">Characterizing and measuring bias in sequence data</span><span class="mt"> · Ross et al. · <i>Genome Biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/23718773" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2013</span><span class="ti">Mutations causing medullary cystic kidney disease type 1 lie in a large VNTR in MUC1 missed by massively parallel sequencing</span><span class="mt"> · Kirby et al. · <i>Nature genetics</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/23396133" target="_blank" rel="noopener">PubMed</a><div class="cmt">Work funded by a Mexican billionaire to locate a highly cryptic mutation responsible for a devastating familial disease.</div></li><li><span class="yr">2013</span><span class="ti">Sensitive detection of somatic point mutations in impure and heterogeneous cancer samples</span><span class="mt"> · Cibulskis et al. · <i>Nature Biotechnology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/23396013" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2013</span><span class="ti">The African coelacanth genome provides insights into tetrapod evolution</span><span class="mt"> · Amemiya et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/23598338" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2012</span><span class="ti">Finished bacterial genomes from shotgun sequence data</span><span class="mt"> · Ribeiro et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/22829535" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2012</span><span class="ti">Molecular diagnosis of infantile mitochondrial disease with targeted next-generation sequencing</span><span class="mt"> · Calvo et al. · <i>Science Translational Medicine</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/22277967" target="_blank" rel="noopener">PubMed</a><div class="cmt">Mitochondria are maternally inherited, heterogeneous, and can carry debilitating mutations.  We study one disease where this happens.</div></li><li><span class="yr">2012</span><span class="ti">Paired-end sequencing of Fosmid libraries by Illumina</span><span class="mt"> · Williams et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/22800726" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2012</span><span class="ti">The genomic basis of adaptive evolution in threespine sticklebacks</span><span class="mt"> · Jones et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/22481358" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2011</span><span class="ti">A high-resolution map of human evolutionary constraint using 29 mammals</span><span class="mt"> · Lindblad-Toh et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21993624" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2011</span><span class="ti">Analyzing and minimizing PCR amplification bias in Illumina sequencing libraries</span><span class="mt"> · Aird et al. · <i>Genome biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21338519" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2011</span><span class="ti">Assemblathon 1: a competitive assessment of de novo short read assembly methods</span><span class="mt"> · Earl et al. · <i>Genome Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21926179" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2011</span><span class="ti">Demographic history and rare allele sharing among human populations</span><span class="mt"> · Gravel et al. · <i>Proceedings of the National Academy of Sciences</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21730125" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2011</span><span class="ti">The functional spectrum of low-frequency coding variation</span><span class="mt"> · Marth et al. · <i>Genome Biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21917140" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2010</span><span class="ti">High-quality draft assemblies of mammalian genomes from massively parallel sequence data</span><span class="mt"> · Gnerre et al. · <i>PNAS</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/21187386" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2010</span><span class="ti">A scalable, fully automated process for construction of sequence-ready barcoded libraries for 454</span><span class="mt"> · Lennon et al. · <i>Genome biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/20137071" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2010</span><span class="ti">Integrative analysis of the melanoma transcriptome</span><span class="mt"> · Berger et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/20179022" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2009</span><span class="ti">ALLPATHS 2: small genomes assembled accurately and with high continuity from short paired reads</span><span class="mt"> · MacCallum et al. · <i>Genome biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19796385" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2009</span><span class="ti">Assisted assembly: how to improve a de novo genome assembly by using related species</span><span class="mt"> · Gnerre et al. · <i>Genome biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19712469" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2009</span><span class="ti">Lineage-specific biology revealed by a finished genome assembly of the mouse</span><span class="mt"> · Church et al. · <i>PLoS Biology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19468303" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2009</span><span class="ti">Solution hybrid selection with ultra-long oligonucleotides for massively parallel targeted sequencing</span><span class="mt"> · Gnirke et al. · <i>Nature biotechnology</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19182786" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2008</span><span class="ti">High-resolution mapping of copy-number alterations with massively parallel sequencing</span><span class="mt"> · Chiang et al. · <i>Nature methods</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19043412" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2008</span><span class="ti">Sensitive, specific polymorphism discovery in bacteria using massively parallel sequencing</span><span class="mt"> · Nusbaum et al. · <i>Nature methods</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/19079253" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2008</span><span class="ti">ALLPATHS: de novo assembly of whole-genome shotgun microreads</span><span class="mt"> · Butler et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/18340039" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2008</span><span class="ti">Digital karyotyping of tumor genomes with massively parallel sequencing [abstract]</span><span class="mt"> · Chiang et al. · <i>Cancer Research</i></span> <a class="lnk" href="https://aacrjournals.org/cancerres/article/68/9_Supplement/5166/546484/Digital-karyotyping-of-tumor-genomes-with" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2008</span><span class="ti">Genome-scale DNA methylation maps of pluripotent and differentiated cells</span><span class="mt"> · Meissner et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/18600261" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2008</span><span class="ti">Quality scores and SNP detection in sequencing-by-synthesis systems</span><span class="mt"> · Brockman et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/18212088" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2007</span><span class="ti">Analyses of deep mammalian sequence alignments and constraint predictions for 1% of the human genome</span><span class="mt"> · Margulies et al. · <i>Genome Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17567995" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2007</span><span class="ti">Evolution of genes and genomes on the Drosophila phylogeny</span><span class="mt"> · Drosophila 12 Genomes Consortium · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17994087" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2007</span><span class="ti">Genome sequence of <i>Aedes aegypti</i>, a major arbovirus vector</span><span class="mt"> · Nene et al. · <i>Science</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17510324" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2007</span><span class="ti">Genome-wide maps of chromatin state in pluripotent and lineage-committed cells</span><span class="mt"> · Mikkelsen et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17603471" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2007</span><span class="ti">Identification and analysis of functional elements in 1% of the human genome by the ENCODE pilot project</span><span class="mt"> · The ENCODE Project Consortium · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17571346" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2006</span><span class="ti">A genome-wide map of diversity in <i>Plasmodium falciparum</i></span><span class="mt"> · Volkman et al. · <i>Nature Genetics</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17159979" target="_blank" rel="noopener">PubMed</a><div class="cmt">The genome of <i>Plasmodium falciparum</i> is dominated by As and Ts, which limited our ability to sequence and assemble its genome correctly, using the technology we had at the time.</div></li><li><span class="yr">2006</span><span class="ti">Analysis of the DNA sequence and duplication history of human chromosome 15</span><span class="mt"> · Zody et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16572171" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2006</span><span class="ti">DNA sequence and analysis of human chromosome 8</span><span class="mt"> · Nusbaum et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16421571" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2006</span><span class="ti">DNA sequence of human chromosome 17 and analysis of rearrangement in the human lineage</span><span class="mt"> · Zody et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16625196" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2006</span><span class="ti">Human chromosome 11 DNA sequence and analysis including novel gene identification</span><span class="mt"> · Taylor et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16554811" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2006</span><span class="ti">Insights from the genome of the biotrophic fungal plant pathogen <i>Ustilago maydis</i></span><span class="mt"> · Kämper et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/17080091" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">An initial strategy for the systematic identification of functional elements in the human genome by low-redundancy comparative sequencing</span><span class="mt"> · Margulies et al. · <i>Proceedings of the National Academy of Sciences</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/15778292" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">Assembly of polymorphic genomes: algorithms and application to <i>Ciona savignyi</i></span><span class="mt"> · Vinson et al. · <i>Genome research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16077012" target="_blank" rel="noopener">PubMed</a><div class="cmt">We assembled the insanely polymorphic genome of one individual <i>Ciona savignyi</i>.  More precisely, we created a frankengenome that crisscrossed the two haplotypes.</div></li><li><span class="yr">2005</span><span class="ti">DNA sequence and analysis of human chromosome 18</span><span class="mt"> · Nusbaum et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16177791" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">Facilitating genome navigation: survey sequencing and dense radiation-hybrid gene mapping</span><span class="mt"> · Hitte et al. · <i>Nature Reviews Genetics</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16012527" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">Genome sequence, comparative analysis and haplotype structure of the domestic dog</span><span class="mt"> · Lindblad-Toh et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16341006" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">Initial sequence of the chimpanzee genome and comparison with the human genome</span><span class="mt"> · The Chimpanzee Sequencing and Analysis Consortium · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/16136131" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2005</span><span class="ti">Synteny-assisted assembly of genomes at low coverage [citation only]</span><span class="mt"> · Gnerre et al. · <i>9th International Conference on Research in Computational Molecular Biology (RECOMB)</i></span></li><li><span class="yr">2004</span><span class="ti">Genome duplication in the teleost fish <i>Tetraodon nigroviridis</i> reveals the early vertebrate proto-karyotype</span><span class="mt"> · Jaillon et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/15496914" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2004</span><span class="ti">The ENCODE (ENCyclopedia Of DNA Elements) Project</span><span class="mt"> · ENCODE Project Consortium · <i>Science</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/15499007" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2003</span><span class="ti">The genome sequence of the filamentous fungus <i>Neurospora crassa</i></span><span class="mt"> · Galagan et al. · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/12712197" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2003</span><span class="ti">Whole-genome sequence assembly for mammalian genomes: Arachne 2</span><span class="mt"> · Jaffe et al. · <i>Genome Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/12529310" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2002</span><span class="ti">Initial sequencing and comparative analysis of the mouse genome</span><span class="mt"> · Mouse Genome Sequencing Consortium · <i>Nature</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/12466850" target="_blank" rel="noopener">PubMed</a></li><li><span class="yr">2002</span><span class="ti">ARACHNE: a whole-genome shotgun assembler</span><span class="mt"> · Batzoglou et al. · <i>Genome Research</i></span> <a class="lnk" href="https://pubmed.ncbi.nlm.nih.gov/11779843" target="_blank" rel="noopener">PubMed</a><div class="cmt">The first paper in my new life as a genome assembler.</div></li><li><span class="yr">2001</span><span class="ti">Numerical results on the asymptotic rate of binary codes</span><span class="mt"> · Barg et al. · <i>Codes and Association Schemes</i></span></li><li><span class="yr">2001</span><span class="ti">Optimal binary linear codes of dimension at most seven</span><span class="mt"> · Bouyukliev et al. · <i>Discrete Mathematics</i></span> <a class="lnk" href="https://www.sciencedirect.com/science/article/pii/S0012365X00001254?__cf_chl_f_tk=c7.PEVMiup_86h0.VJXFi5.7wG7pH71n_rgX87vHT2g-1783002128-1.0.1.1-oHbcAZAryNLqvhhJZS9nNpeI4WX5gBUJOjn8WZFAuFs" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2000</span><span class="ti">Optimal binary linear codes of length &lt;= 30</span><span class="mt"> · Jaffe · <i>Discrete Mathematics</i></span> <a class="lnk" href="https://www.sciencedirect.com/science/article/pii/S0012365X99001351" target="_blank" rel="noopener">URL</a></li><li><span class="yr">2000</span><span class="ti">The smallest length of eight-dimensional binary linear codes with prescribed minimum distance</span><span class="mt"> · Bouyukliev et al. · <i>IEEE Transactions on Information Theory</i></span> <a class="lnk" href="https://ieeexplore.ieee.org/document/850690" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1999</span><span class="ti">New binary linear codes which are dual transforms of good codes</span><span class="mt"> · Jaffe et al. · <i>IEEE Transactions on Information Theory</i></span> <a class="lnk" href="https://ieeexplore.ieee.org/document/782159" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1998</span><span class="ti">Computing linear codes and unitals</span><span class="mt"> · Jaffe et al. · <i>Designs, Codes and Cryptography</i></span> <a class="lnk" href="https://link.springer.com/article/10.1023/A:1008204420606" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1998</span><span class="ti">Looking inside codes [citation only]</span><span class="mt"> · Jaffe · <i>Proceedings of the Second International Workshop on Optimal Codes and Related Topics (Sozopol, Bulgaria, 1998)</i></span></li><li><span class="yr">1997</span><span class="ti">A brief tour of split linear programming</span><span class="mt"> · Jaffe · <i>Applied Algebra, Algebraic Algorithms and Error-Correcting Codes (AAECC 12)</i></span> <a class="lnk" href="https://link.springer.com/chapter/10.1007/3-540-63163-1_13" target="_blank" rel="noopener">URL</a><div class="cmt">I built a system for systematically proving the nonexistence of binary linear codes using linear programming.</div></li><li><span class="yr">1997</span><span class="ti">A sextic surface cannot have 66 nodes</span><span class="mt"> · Jaffe et al. · <i>Journal of Algebraic Geometry</i></span> <a class="lnk" href="https://www.researchgate.net/publication/2814060_A_Sextic_Surface_Cannot_Have_66_Nodes" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1997</span><span class="ti">Coherent functors, with application to torsion in the Picard group</span><span class="mt"> · Jaffe · <i>Transactions of the American Mathematical Society</i></span> <a class="lnk" href="https://arxiv.org/abs/alg-geom/9410009" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1996</span><span class="ti">Functorial structure of units in a tensor product</span><span class="mt"> · Jaffe · <i>Transactions of the American Mathematical Society</i></span> <a class="lnk" href="https://arxiv.org/abs/alg-geom/9410010" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1996</span><span class="ti">On the Picard group: torsion and the kernel induced by a faithfully flat map</span><span class="mt"> · Guralnick et al. · <i>Journal of Algebra</i></span> <a class="lnk" href="https://www.sciencedirect.com/science/article/pii/S0021869396902288" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1995</span><span class="ti">Applications of iterated curve blowup to set theoretic complete intersections</span><span class="mt"> · Jaffe · <i>Journal fur die reine und angewandte Mathematik (Crelle)</i></span> <a class="lnk" href="https://arxiv.org/abs/alg-geom/9410008" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1995</span><span class="ti">New results on binary linear codes</span><span class="mt"> · Jaffe · <i>arXiv</i></span> <a class="lnk" href="https://arxiv.org/abs/math/9508219" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1993</span><span class="ti">Extensions of etale by connected group spaces</span><span class="mt"> · Jaffe · <i>Transactions of the American Mathematical Society</i></span> <a class="lnk" href="https://www.ams.org/journals/tran/1993-335-01/S0002-9947-1993-1150015-4/S0002-9947-1993-1150015-4.pdf" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1992</span><span class="ti">Local geometry of smooth curves passing through rational double points</span><span class="mt"> · Jaffe · <i>Mathematische Annalen</i></span> <a class="lnk" href="https://link.springer.com/article/10.1007/BF01934346" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1991</span><span class="ti">On sections of commutative group schemes</span><span class="mt"> · Jaffe · <i>Compositio Mathematica</i></span> <a class="lnk" href="https://www.numdam.org/item/CM_1991__80_2_171_0" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1991</span><span class="ti">Smooth curves on a cone which pass through its vertex</span><span class="mt"> · Jaffe · <i>Manuscripta Mathematica</i></span> <a class="lnk" href="https://link.springer.com/article/10.1007/BF02567638" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1989</span><span class="ti">On Kodaira vanishing for singular varieties</span><span class="mt"> · Arapura et al. · <i>Proceedings of the American Mathematical Society</i></span> <a class="lnk" href="https://www.jstor.org/stable/2047052" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1989</span><span class="ti">On set theoretic complete intersections in P^3</span><span class="mt"> · Jaffe · <i>Mathematische Annalen</i></span> <a class="lnk" href="https://link.springer.com/article/10.1007/BF02568376" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1989</span><span class="ti">Relative representability of group scheme sections</span><span class="mt"> · Jaffe · <i>American Journal of Mathematics</i></span> <a class="lnk" href="https://www.jstor.org/stable/2374752" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1988</span><span class="ti">Space curves which are the intersection of a cone with another surface</span><span class="mt"> · Jaffe · <i>Duke Mathematical Journal</i></span> <a class="lnk" href="https://projecteuclid.org/journals/duke-mathematical-journal/volume-57/issue-3/Space-curves-which-are-the-intersection-of-a-cone-with/10.1215/S0012-7094-88-05738-9.short" target="_blank" rel="noopener">URL</a></li><li><span class="yr">1987</span><span class="ti">Curves on cones (PhD thesis)</span><span class="mt"> · Jaffe · <i>University of California, Berkeley</i></span><div class="cmt">My PhD: I study and make a little progress on the longstanding open problem of whether a curve in three-space that can be described algebraically can be described by two algebraic equations.  I remember fondly the wonderous joys of pure mathematics!  This was my life for about twenty years.  Ultimately, I needed other nourishment.</div></li></ol>
+    </div>
+  </section>
+</main>
+<div id="lb" aria-hidden="true"></div>
+<script>
+  // Autoplay, but politely. A muted clip plays only while its tile is on-screen and
+  // pauses when it scrolls out of view, so the two multi-MB videos fetch on demand
+  // (the tags carry preload="none") instead of all at once on load, and don't run
+  // off-screen. Falls back to plain muted autoplay where IntersectionObserver is absent.
+  (function () {
+    var vids = document.querySelectorAll("video");
+    function play(v) { v.muted = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    if (!("IntersectionObserver" in window)) {
+      window.addEventListener("load", function () { vids.forEach(play); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) play(e.target); else e.target.pause();
+      });
+    }, { threshold: 0.2 });
+    vids.forEach(function (v) { io.observe(v); });
+  })();
+
+  // ---- lightbox: click/tap a photo to enlarge it over a dimmed backdrop -------
+  // Uses a viewport-fixed overlay (#lb) so it isn't clipped by the mosaic's nested
+  // overflow:hidden. The enlarged media reuses the same full-resolution file; the
+  // hover caption rides along beneath it. Close via click, tap, or Esc.
+  (function () {
+    var lb = document.getElementById("lb");
+    function close() { lb.classList.remove("open"); lb.setAttribute("aria-hidden", "true"); lb.innerHTML = ""; }
+    function open(cell) {
+      var media = cell.querySelector("img, video");
+      if (!media) return;
+      var fig = document.createElement("figure");
+      var big;
+      if (media.tagName === "VIDEO") {
+        big = document.createElement("video");
+        big.src = media.currentSrc || media.src;
+        big.autoplay = big.loop = big.muted = true;
+        big.setAttribute("playsinline", "");
+      } else {
+        big = document.createElement("img");
+        big.src = media.currentSrc || media.src;
+        big.alt = media.alt || "";
+      }
+      fig.appendChild(big);
+      var cap = cell.querySelector("figcaption");
+      if (cap && cap.textContent.trim()) {
+        var c = document.createElement("figcaption");
+        c.innerHTML = cap.innerHTML;
+        fig.appendChild(c);
+      }
+      lb.innerHTML = "";
+      lb.appendChild(fig);
+      lb.classList.add("open");
+      lb.setAttribute("aria-hidden", "false");
+    }
+    var pics = document.querySelector(".pics");
+    if (pics) {
+      pics.addEventListener("click", function (e) {
+        var cell = e.target.closest(".cell");
+        if (cell) open(cell);
+      });
+      pics.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          var cell = e.target.closest(".cell");
+          if (cell) { e.preventDefault(); open(cell); }
+        }
+      });
+    }
+    lb.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  })();
+
+  // ---- pics mosaic: vertically-JUSTIFIED column masonry, aspect-preserving ---
+  // Tiles are packed into N columns (a tile of weight w spans round(sqrt(w))
+  // columns, so the elephant seal spans 2 and reads large; "me" anchors top-left).
+  // That packing alone leaves a RAGGED bottom. We then solve each column's WIDTH so
+  // every column reaches one common height T -- a small linear system (column
+  // heights all = T, widths sum to the block width). Because the columns were
+  // already near-equal, the width changes are tiny, every photo keeps its native
+  // aspect (no cropping), and ALL column bottoms land on one flush line, leaving a
+  // single uniform whitespace strip at the bottom (H - T). The partition (N + order)
+  // is chosen to minimize that bottom strip.
+  function layoutPics() {
+    var pics = document.querySelector(".pics");
+    if (!pics) return;
+    var cells = Array.prototype.filter.call(pics.children, function (c) { return c.classList.contains("cell"); });
+    if (window.innerWidth <= 640) {
+      pics.classList.remove("packed");
+      cells.forEach(function (c) { c.removeAttribute("style"); });
+      return;
+    }
+    var W = pics.clientWidth, H = pics.clientHeight;
+    if (W < 10 || H < 10) return;
+    pics.classList.add("packed");
+    var ar = function (c) { return parseFloat(c.dataset.ar) || 1; };
+    var wt = function (c) { return parseFloat(c.dataset.weight) || 1; };
+    var gap = Math.max(6, Math.min(W, H) * 0.018); // gutter between tiles
+    var span = function (c, N) { return Math.max(1, Math.min(N, Math.round(Math.sqrt(wt(c))))); };
+    var me = cells.filter(function (c) { return c.dataset.role === "me"; })[0];
+    var rest0 = cells.filter(function (c) { return c !== me; });
+
+    // masonry pack into N EQUAL columns -> the tile->column assignment + spans +
+    // placement order (the bottom is ragged; widths are solved afterward). Two
+    // orders are tried: seeded, and tallest-first (LPT) for flatter columns.
+    function pack(N, balanced) {
+      var colW = (W - (N - 1) * gap) / N, heights = [], out = [];
+      for (var i = 0; i < N; i++) heights.push(0);
+      var place = function (c) {
+        var sp = span(c, N), best = 0, bestY = Infinity;
+        for (var st = 0; st + sp <= N; st++) {
+          var yy = 0; for (var j = st; j < st + sp; j++) if (heights[j] > yy) yy = heights[j];
+          if (yy < bestY) { bestY = yy; best = st; }
+        }
+        var w = sp * colW + (sp - 1) * gap;
+        out.push({ c: c, col0: best, sp: sp });
+        for (var j2 = best; j2 < best + sp; j2++) heights[j2] = bestY + w / ar(c) + gap;
+      };
+      var hOf = function (c) { var sp = span(c, N); return (sp * colW + (sp - 1) * gap) / ar(c); };
+      if (me) place(me);
+      var rest = rest0.slice();
+      if (balanced) rest.sort(function (a, b) { return hOf(b) - hOf(a); });
+      for (var k = 0; k < rest.length; k++) place(rest[k]);
+      return { out: out, N: N };
+    }
+
+    // Solve column widths w[0..N-1] + common height T from the packing: for each
+    // column j, sum of its tiles' heights (a tile of width = sum of its spanned
+    // column widths + inner gaps; height = width/ar) + vertical gaps == T; and the
+    // widths sum to the block width. (N+1) linear equations, solved by elimination.
+    // Returns {w, T} or null (degenerate / non-positive width).
+    function solve(placed, N) {
+      var n = N + 1, A = [];
+      for (var i = 0; i < n; i++) { var row = []; for (var c2 = 0; c2 <= n; c2++) row.push(0); A.push(row); }
+      for (var j = 0; j < N; j++) {
+        var cnt = 0;
+        for (var ti = 0; ti < placed.length; ti++) {
+          var t = placed[ti];
+          if (j >= t.col0 && j < t.col0 + t.sp) {
+            cnt++;
+            for (var k = t.col0; k < t.col0 + t.sp; k++) A[j][k] += 1 / ar(t.c);
+            A[j][n] += -((t.sp - 1) * gap / ar(t.c)); // -> rhs
+          }
+        }
+        A[j][N] = -1;                 // coefficient of T
+        A[j][n] += -((cnt - 1) * gap); // rhs (vertical gaps)
+      }
+      for (var k2 = 0; k2 < N; k2++) A[N][k2] = 1; // width equation
+      A[N][N] = 0; A[N][n] = W - (N - 1) * gap;
+      // Gauss-Jordan with partial pivoting.
+      for (var i2 = 0; i2 < n; i2++) {
+        var p = i2; for (var r = i2 + 1; r < n; r++) if (Math.abs(A[r][i2]) > Math.abs(A[p][i2])) p = r;
+        if (Math.abs(A[p][i2]) < 1e-9) return null;
+        var tmp = A[i2]; A[i2] = A[p]; A[p] = tmp;
+        var piv = A[i2][i2]; for (var c3 = i2; c3 <= n; c3++) A[i2][c3] /= piv;
+        for (var r2 = 0; r2 < n; r2++) if (r2 !== i2) { var f = A[r2][i2]; for (var c4 = i2; c4 <= n; c4++) A[r2][c4] -= f * A[i2][c4]; }
+      }
+      var w = [], T = A[N][n];
+      for (var q = 0; q < N; q++) { w.push(A[q][n]); if (!(A[q][n] > 1) || !isFinite(A[q][n])) return null; }
+      if (!(T > 1) || !isFinite(T)) return null;
+      return { w: w, T: T };
+    }
+
+    // choose the partition (N + order) whose flush height T is CLOSEST to the block
+    // height -- that maximizes coverage (least whitespace, since coverage =
+    // min(T,H)/max(T,H)). T just under H -> a small uniform bottom strip; T just over
+    // -> scaled to fit with a small centred side margin. Both keep the bottom flush.
+    var best = null;
+    for (var N = 3; N <= 6; N++) {
+      for (var b = 0; b < 2; b++) {
+        var p = pack(N, b === 1), sol = solve(p.out, N);
+        if (!sol) continue;
+        var score = Math.abs(sol.T - H);
+        if (!best || score < best.score) best = { score: score, placed: p.out, N: N, w: sol.w, T: sol.T };
+      }
+    }
+    if (!best) return; // no usable layout
+
+    // replay the packing with the solved widths to get x/y of every tile (column
+    // bottoms now all land at T -> flush). xcol = cumulative column lefts.
+    var Nn = best.N, w = best.w, xcol = [0];
+    for (var i3 = 1; i3 < Nn; i3++) xcol.push(xcol[i3 - 1] + w[i3 - 1] + gap);
+    var heights = []; for (var i4 = 0; i4 < Nn; i4++) heights.push(0);
+    var tiles = [];
+    for (var ti2 = 0; ti2 < best.placed.length; ti2++) {
+      var t2 = best.placed[ti2], tw = (t2.sp - 1) * gap;
+      for (var k3 = t2.col0; k3 < t2.col0 + t2.sp; k3++) tw += w[k3];
+      var yy2 = 0; for (var j3 = t2.col0; j3 < t2.col0 + t2.sp; j3++) if (heights[j3] > yy2) yy2 = heights[j3];
+      var hh = tw / ar(t2.c);
+      tiles.push({ c: t2.c, x: xcol[t2.col0], y: yy2, w: tw, h: hh });
+      for (var j4 = t2.col0; j4 < t2.col0 + t2.sp; j4++) heights[j4] = yy2 + hh + gap;
+    }
+
+    // if the flush height overflows the block, scale to fit (still aspect-true) and
+    // centre horizontally; otherwise the slack is one uniform strip at the bottom.
+    var fit = best.T > H ? H / best.T : 1, xoff = (W - W * fit) / 2;
+    for (var pi = 0; pi < tiles.length; pi++) {
+      var pl = tiles[pi];
+      pl.c.style.left = ((pl.x * fit + xoff) / W * 100) + "%";
+      pl.c.style.top = (pl.y * fit / H * 100) + "%";
+      pl.c.style.width = (pl.w * fit / W * 100) + "%";
+      pl.c.style.height = (pl.h * fit / H * 100) + "%";
+    }
+  }
+
+  window.addEventListener("load", layoutPics);
+  var _rt;
+  window.addEventListener("resize", function () { clearTimeout(_rt); _rt = setTimeout(layoutPics, 120); });
+</script>
+</body>
+</html>
