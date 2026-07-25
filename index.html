@@ -175,13 +175,18 @@
     .photo .frame { width: 40vw; }
     .publist { columns: 1; font-size: 14px !important; overflow: visible; }
     img, video { max-width: 100%; }
-    /* phone: ignore the packed treemap; a simple 2-col grid that scrolls */
-    .pics, .pics.packed { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-auto-rows: auto; height: auto; }
-    .pics.packed .cell { position: relative; left: auto !important; top: auto !important;
-      width: auto !important; height: auto !important; aspect-ratio: 4 / 3; }
-    .cell { aspect-ratio: 4 / 3; }
-    .cell.me { aspect-ratio: 3 / 4; }
+    /* phone: ignore the packed treemap; a 2-column MASONRY that scrolls.
+       Not a grid: a grid aligns tiles in ROWS, so the portrait "me" tile (3:4) makes
+       its row taller than the 4:3 tile beside it and leaves a hole under the short
+       one. Multi-column flows each column independently, so there are no holes — and
+       once the tiles no longer have to share a row height, the forced 4:3 can go too,
+       and every photo shows at its own aspect instead of being cropped to it. */
+    .pics, .pics.packed { display: block; columns: 2; column-gap: 3.5vw; height: auto; }
+    .pics .cell, .pics.packed .cell { position: relative; left: auto !important;
+      top: auto !important; width: 100% !important; height: auto !important;
+      aspect-ratio: auto; margin: 0 0 3.5vw;
+      break-inside: avoid; -webkit-column-break-inside: avoid; }
+    .cell > img, .cell > video { height: auto; }
     .bio h1, .bio p, .bio .int { font-size: 4vw; }
     .bio h1, .bio p, .bio li { overflow-wrap: anywhere; }
   }
